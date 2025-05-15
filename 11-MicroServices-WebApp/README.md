@@ -16,6 +16,7 @@ You can find this public Github Repo here: [Github Repo](https://github.com/jais
 - Create an IAM User
 - Create an EKS Cluster
 - Install and Configure Jenkins
+-  Configuring CD (Continuous Integration)
 
 ## 1. Launching an Ubuntu EC2 Server
 
@@ -294,15 +295,16 @@ _Jenkins will install the **suggested plugins** by itself._
 
 ![Image](https://github.com/UXHERI/DevOps-Projects/blob/main/11-MicroServices-WebApp/Images/22.png?raw=true)
 
-- In the **Available plugins*, add these 4 plugins:
+- In the **Available plugins**, add these 4 plugins:
 
     1. Docker
     2. Docker Pipeline
+    3. Kubernetes
+    4. Kubernetes CLI
 
 ![Image](https://github.com/UXHERI/DevOps-Projects/blob/main/11-MicroServices-WebApp/Images/23.png?raw=true)
 
-    3. Kubernetes
-    4. Kubernetes CLI
+
 
 ![Image](https://github.com/UXHERI/DevOps-Projects/blob/main/11-MicroServices-WebApp/Images/24.png?raw=true)
 
@@ -355,6 +357,11 @@ _Jenkins will install the **suggested plugins** by itself._
 
 ![Image](https://github.com/UXHERI/DevOps-Projects/blob/main/11-MicroServices-WebApp/Images/41.png?raw=true)
 
+- In a new tab, go to **Jenkins Dashboard**, then **Plugins** and install a plugin named `Multibranch Scan Webhook Trigger`.
+
+![Image](https://github.com/UXHERI/DevOps-Projects/blob/main/11-MicroServices-WebApp/Images/44.png?raw=true)
+
+- Now return to the previous tab.
 - In **Scan Multibranch Pipeline Triggers**, select **Scan by webhook**.
 - Name your **Trigger token**.
 - Click on **[?]** next to the Trigger token.
@@ -363,3 +370,170 @@ _Jenkins will install the **suggested plugins** by itself._
 ![Image](https://github.com/UXHERI/DevOps-Projects/blob/main/11-MicroServices-WebApp/Images/42.png?raw=true)
 
 
+- In the **JENKINS_URL** write your **EC2 Public IP** and in the **[TRIGGER TOKEN]** write the name of the **Trigger Token** you specified:
+
+```URL
+http://3.82.11.125:8080/multibranch-webhook-trigger/invoke?token=uxheri
+```
+- Now before applying it, go to your **Github Repo**.
+- CLick on **Settings**.
+
+![Image](https://github.com/UXHERI/DevOps-Projects/blob/main/11-MicroServices-WebApp/Images/45.png?raw=true)
+
+- Click on **Webhooks**.
+
+![Image](https://github.com/UXHERI/DevOps-Projects/blob/main/11-MicroServices-WebApp/Images/46.png?raw=true)
+
+- Click **Add webhook**.
+- In the **Payload URL** post your URL and select **Content type** as `application/json`.
+
+
+![Image](https://github.com/UXHERI/DevOps-Projects/blob/main/11-MicroServices-WebApp/Images/47.png?raw=true)
+
+- Keep these settings as are:
+
+![Image](https://github.com/UXHERI/DevOps-Projects/blob/main/11-MicroServices-WebApp/Images/48.png?raw=true)
+
+- Click **Add Webhook**.
+- On **Jenkins Pipeline Configuration** page, click **Apply** and **Save**.
+
+_Now you will see that your Pipeline is running and is building all the 11 MicroServices._ 
+
+![Image](https://github.com/UXHERI/DevOps-Projects/blob/main/11-MicroServices-WebApp/Images/43.png?raw=true)
+
+**_Once all of these get build completely, this means that the CI (Continuous Integration) part is DONE SUCCESSFULLY!_**
+
+## 6. Configuring CD (Continuous Integration)
+
+In this step, we are going to configure the CD (Continuous Integration) part of this project.
+
+- First, we will create **Service Account**.
+
+```bash
+vim svc.yml
+```
+
+- Copy/paste this into `svc.yml`:
+
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: jenkins
+  namespace: webapps
+```
+
+- Now **Create Role**:
+
+```bash
+vim role.yml
+```
+
+- Copy/paste this into `role.yml`:
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: app-role
+  namespace: webapps
+rules:
+  - apiGroups:
+        - ""
+        - apps
+        - autoscaling
+        - batch
+        - extensions
+        - policy
+        - rbac.authorization.k8s.io
+    resources:
+      - pods
+      - componentstatuses
+      - configmaps
+      - daemonsets
+      - deployments
+      - events
+      - endpoints
+      - horizontalpodautoscalers
+      - ingress
+      - jobs
+      - limitranges
+      - namespaces
+      - nodes
+      - pods
+      - persistentvolumes
+      - persistentvolumeclaims
+      - resourcequotas
+      - replicasets
+      - replicationcontrollers
+      - serviceaccounts
+      - services
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+```
+
+- Now **Bind** the role to service account:
+
+```bash
+vim bind.yml
+```
+
+- Copy/paste this into `bind.yml`:
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: app-rolebinding
+  namespace: webapps 
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: app-role 
+subjects:
+- namespace: webapps 
+  kind: ServiceAccount
+  name: jenkins 
+```
+
+- Create a **secret**:
+
+```bash
+vim sec.yml
+```
+- Copy/paste this into `sec.yml`:
+
+```yaml
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/service-account-token
+metadata:
+  name: mysecretname
+  namespace: webapps
+  annotations:
+    kubernetes.io/service-account.name: jenkins
+```
+- Now apply these YAML files:
+
+```bash
+kubectl apply -f svc.yml
+kubectl apply -f role.yml
+kubectl apply -f bind.yml
+kubectl apply -f sec.yml
+```
+- Run this command and copy the output:
+
+```bash
+kubectl describe secret mysecretname -n webapps
+```
+![Image](https://github.com/UXHERI/DevOps-Projects/blob/main/11-MicroServices-WebApp/Images/49.png?raw=true)
+
+- Now go back to **Jenkins Credentials** page and add a credential:
+    - **Kind**: Secret text
+    - **Secret**: [THE-RESULTED-OUTPUT]
+    - **ID**: k8-token
+    - **Description**: k8-token
+
+-  Now head to **Jenkins Dashboard** and create a **New item**.
+
+- Enter name as `Dummy`.
+- Select type as `Pipeline`.
