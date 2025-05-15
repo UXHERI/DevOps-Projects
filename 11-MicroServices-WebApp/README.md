@@ -376,7 +376,7 @@ _Jenkins will install the **suggested plugins** by itself._
 http://3.82.11.125:8080/multibranch-webhook-trigger/invoke?token=uxheri
 ```
 - Now before applying it, go to your **Github Repo**.
-- CLick on **Settings**.
+- Click on **Settings**.
 
 ![Image](https://github.com/UXHERI/DevOps-Projects/blob/main/11-MicroServices-WebApp/Images/45.png?raw=true)
 
@@ -533,7 +533,57 @@ kubectl describe secret mysecretname -n webapps
     - **ID**: k8-token
     - **Description**: k8-token
 
--  Now head to **Jenkins Dashboard** and create a **New item**.
+-  Now head to the **main** branch in your **Github Repo**.
+- Update the `Jenkinsfile`:
 
-- Enter name as `Dummy`.
-- Select type as `Pipeline`.
+```bash
+pipeline {
+    agent any
+    
+    stages {
+        stage('Deploy to Kubernetes') {
+            steps {
+                withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: ' EKS-1', contextName: '', credentialsId: 'k8s-token', namespace: 'webapps', serverUrl: 'https://099321E17EE35EA8B6A8A602FEA9D19B.gr7.us-east-1.eks.amazonaws.com']]) {
+                    sh "kubectl apply -f deployment-service.yml"
+                }
+            }
+        }
+        
+        stage('Verify Deployment') {
+            steps {
+                withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: ' EKS-1', contextName: '', credentialsId: 'k8s-token', namespace: 'webapps', serverUrl: 'https://099321E17EE35EA8B6A8A602FEA9D19B.gr7.us-east-1.eks.amazonaws.com']]) {
+                    sh "kubectl get svc -n webapps"
+                }
+            }
+        }
+    }
+}
+```
+
+> [!NOTE]
+> Change the **serverUrl** and **clusterName** according to you.
+
+![Image](https://github.com/UXHERI/DevOps-Projects/blob/main/11-MicroServices-WebApp/Images/58.png?raw=true)
+
+- **Save** this file.
+- Now your **Jenkins Pipeline** will start building the **main** branch pipeline again.
+- Now click on **main**, and go to your latest build.
+- Now click **Console Output**.
+
+![Image](https://github.com/UXHERI/DevOps-Projects/blob/main/11-MicroServices-WebApp/Images/55.png?raw=true)
+
+- From the output logs, copy the **frontend-external** URL.
+
+
+![Image](https://github.com/UXHERI/DevOps-Projects/blob/main/11-MicroServices-WebApp/Images/56.png?raw=true)
+
+- Paste this into your web browser.
+
+![Image](https://github.com/UXHERI/DevOps-Projects/blob/main/11-MicroServices-WebApp/Images/33.png?raw=true)
+
+![Image](https://github.com/UXHERI/DevOps-Projects/blob/main/11-MicroServices-WebApp/Images/34.png?raw=true)
+
+![Image](https://github.com/UXHERI/DevOps-Projects/blob/main/11-MicroServices-WebApp/Images/35.png?raw=true)
+
+
+_**Congrats!!! You have successfully build and deployed this WebApp using Kubernetes and Jenkins.**_
