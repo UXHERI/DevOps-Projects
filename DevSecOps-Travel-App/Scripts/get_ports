@@ -1,0 +1,11 @@
+#!/bin/bash
+
+get_services_and_ports() {
+  echo "Fetching external NodePorts for Prometheus and Grafana..."
+
+  PROMETHEUS_PORT=$(kubectl get svc stable-kube-prometheus-sta-prometheus -n prometheus -o jsonpath="{.spec.ports[0].nodePort}")
+  GRAFANA_PORT=$(kubectl get svc stable-grafana -n prometheus -o jsonpath="{.spec.ports[0].nodePort}")
+
+  echo "Access URLs:"
+  echo "  Prometheus: http://<your-public-ip>:$PROMETHEUS_PORT"
+  echo "  Grafana:    http://<your-public-ip>:$GRAFANA_PORT"
