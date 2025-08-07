@@ -47,20 +47,22 @@ get_services() {
 }
 
 expose_prometheus_nodeport() {
-  echo "Exposing Prometheus service using NodePort..."
-  kubectl edit svc stable-kube-prometheus-sta-prometheus -n prometheus
+  echo "Patching Prometheus service to NodePort..."
+  kubectl patch svc stable-kube-prometheus-sta-prometheus -n prometheus \
+    -p '{"spec": {"type": "NodePort"}}'
 }
 
 expose_grafana_nodeport() {
-  echo "Exposing Grafana service using NodePort..."
-  kubectl edit svc stable-grafana -n prometheus
+  echo "Patching Grafana service to NodePort..."
+  kubectl patch svc stable-grafana -n prometheus \
+    -p '{"spec": {"type": "NodePort"}}'
 }
 
 get_grafana_password() {
   echo "Fetching Grafana admin password..."
-  PASSWORD=$(kubectl get secret --namespace prometheus stable-grafana -o jsonpath="{.data.admin-password}" | base64 --decode)
+  GRAFANA_PASSWORD=$(kubectl get secret --namespace prometheus stable-grafana -o jsonpath="{.data.admin-password}" | base64 --decode)
   echo "Username: admin"
-  echo "Password: $PASSWORD"
+  echo "Password: $GRAFANA_PASSWORD"
 }
 
 echo "********** PROMETHEUS & GRAFANA INSTALLATION STARTED **********"
@@ -93,9 +95,25 @@ if ! get_services; then
   echo "WARNING: Could not retrieve services"
 fi
 
-echo "********** IMPORTANT: MANUAL STEPS REQUIRED **********"
-echo "- Now run: expose_prometheus_nodeport to change Prometheus service to NodePort"
-echo "- Then run: expose_grafana_nodeport to expose Grafana"
-echo "- After exposing, run: get_services to find the external ports"
-echo "- Access Grafana at http://<public-ip>:<grafana-node-port>"
-echo "- Run: get_grafana_password to retrieve login credentials"
+if ! expose_prometheus_nodeport; then
+  echo "FAILED: Exposing Prometheus"
+  exit 1
+fi
+
+if ! expose_grafana_nodeport; then
+  echo "FAILED: Exposing Grafana"
+  exit 1
+fi
+
+if ! get_grafana_password; then
+  echo "FAILED: Fetching Grafana password"
+  exit 1
+fi
+
+echo "********** MONITORING SETUP COMPLETED SUCCESSFULLY **********"
+echo "✅ Prometheus and Grafana are now exposed via NodePort"
+echo "🔗 Access Prometheus: http://<your-node-ip>:PROMETHEUS_PORT"
+echo "🔗 Access Grafana:    http://<your-node-ip>:GRAFANA_PORT"
+echo "🔐 Grafana Login Credentials:"
+echo "Username: admin"
+echo "Password: $GRAFANA_PASSWORD"
