@@ -731,6 +731,23 @@ argocd cluster add Wanderlust@wanderlust.us-east-1.eksctl.io --name wanderlust-e
 
 ![](https://raw.githubusercontent.com/UXHERI/DevOps-Projects/refs/heads/main/DevSecOps-Travel-App/Images/59.png)
 
+- Go to your **DockerHub** account.
+- Generate a **Personal Access Token**.
+
+![](https://raw.githubusercontent.com/UXHERI/DevOps-Projects/refs/heads/main/DevSecOps-Travel-App/Images/51.png)
+
+- Now go to **Jenkins** --> **Manage Jenkins** --> **Credentials** --> **System** --> **Global credentials**.
+- Add the following credentials as:
+    - **Kind**: Username with password
+    - **Username**: [YOUR DOCKERHUB USERNAME]
+    - **Password**: [YOUR DOCKERHUB TOKEN]
+    - **ID**: docker
+
+> [!IMPORTANT]
+> You will also need to update the **INSTANCE_ID** in `updatebackendnew.sh` and `updatefrontendnew.sh` to the **Public IP** of the **EKS Cluster Node**.
+
+![](https://raw.githubusercontent.com/UXHERI/DevOps-Projects/refs/heads/main/DevSecOps-Travel-App/Images/78.png)
+
 ## 4. Configuring Prometheus & Grafana
 
 Now we have to add **Prometheus** and **Grafana** to **EKS Cluster Nodes** to enable **Monitoring** & **Logging** on them.
