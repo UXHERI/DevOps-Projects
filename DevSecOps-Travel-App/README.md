@@ -101,6 +101,12 @@ fi
 
 echo "********** INSTALLATION DONE **********"
 ```
+- Run this command to install **docker**:
+
+```bash
+sudo apt-get install docker.io -y
+sudo usermod -aG docker ubuntu && newgrp docker
+```
 
 - Now make a `jenkins.sh` file and paste the following code to install **Jenkins**:
 
@@ -127,6 +133,16 @@ install_jenkins() {
     sudo apt-get install jenkins
 }
 
+add_jenkins_to_docker() {
+    echo "Adding Jenkins user to Docker group..."
+    sudo usermod -aG docker jenkins
+
+    echo "Restarting Jenkins service..."
+    sudo systemctl restart jenkins
+
+    echo "✔ Jenkins user added to Docker group and Jenkins service restarted."
+}
+
 echo "********** INSTALLATION STARTED **********"
 if ! install_java; then
     echo "INSTALLING JAVA FAILED!!!"
@@ -137,6 +153,9 @@ if ! install_jenkins; then
     echo "INSTALLING JENKINS FAILED!!!"
     exit 1
 fi
+
+# Add Jenkins user to Docker group
+add_jenkins_to_docker
 
 echo "********** INSTALLATION DONE **********"
 ```
@@ -151,13 +170,6 @@ aws configure
     - Your IAM User **Access Key**
     - Your IAM User **Secret Access Key**
     - The **region** you want to deploy your EKS Cluster in (e.g `us-east-1`).
-
-- Run this command to install **docker**:
-
-```bash
-sudo apt-get install docker.io -y
-sudo usermod -aG docker ubuntu && newgrp docker
-```
 
 - Now make an **EC2 Key-Pair** named `eks-nodegroup-key`.
 - Now to make an **EKS Cluster**, run this script in a `eks_cluster.sh` file:
