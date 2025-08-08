@@ -20,6 +20,16 @@ install_jenkins() {
     sudo apt-get install jenkins
 }
 
+add_jenkins_to_docker() {
+    echo "Adding Jenkins user to Docker group..."
+    sudo usermod -aG docker jenkins
+
+    echo "Restarting Jenkins service..."
+    sudo systemctl restart jenkins
+
+    echo "✔ Jenkins user added to Docker group and Jenkins service restarted."
+}
+
 echo "********** INSTALLATION STARTED **********"
 if ! install_java; then
     echo "INSTALLING JAVA FAILED!!!"
@@ -30,5 +40,8 @@ if ! install_jenkins; then
     echo "INSTALLING JENKINS FAILED!!!"
     exit 1
 fi
+
+# Add Jenkins user to Docker group
+add_jenkins_to_docker
 
 echo "********** INSTALLATION DONE **********"
