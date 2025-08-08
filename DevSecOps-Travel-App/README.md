@@ -43,6 +43,35 @@ terraform apply
 > [!IMPORTANT]
 > Change the `IdentityFile` with the location of your **Private SSH Key**.
 
+- Go to **IAM** --> **Roles** --> **Create role**.
+- Select the **Trusted entity type** as **AWS service**.
+
+![](https://raw.githubusercontent.com/UXHERI/DevOps-Projects/refs/heads/main/DevSecOps-Travel-App/Images/67.png)
+
+- Select **Service or use case** as `EC2`.
+
+![](https://raw.githubusercontent.com/UXHERI/DevOps-Projects/refs/heads/main/DevSecOps-Travel-App/Images/68.png)
+
+- Add `Administrator Access` permission.
+
+![](https://raw.githubusercontent.com/UXHERI/DevOps-Projects/refs/heads/main/DevSecOps-Travel-App/Images/69.png)
+
+- Name it `EC2-Wanderlust-Role`.
+
+![](https://raw.githubusercontent.com/UXHERI/DevOps-Projects/refs/heads/main/DevSecOps-Travel-App/Images/70.png)
+
+- Click **Create**.
+- Now go to **Instances**.
+- Select `Wanderlust-Master`.
+- Go to **Actions** --> **Security** --> **Modify IAM role**.
+
+![](https://raw.githubusercontent.com/UXHERI/DevOps-Projects/refs/heads/main/DevSecOps-Travel-App/Images/71.png)
+
+- Select `EC2-Wanderlust-Role`.
+- Click **Update IAM role**.
+
+![](https://raw.githubusercontent.com/UXHERI/DevOps-Projects/refs/heads/main/DevSecOps-Travel-App/Images/72.png)
+
 ## 2. Install the required Tools
 
 Now when we have successfully connected to the **EC2 instance**, let's install the tools we will be using in this project.
