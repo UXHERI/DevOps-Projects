@@ -1,36 +1,53 @@
 #!/bin/bash
 
-<< task
-Run SonarQube Server in a Docker container
-Used in Wanderlust Mega Project for code quality analysis
-task
+# ANSI color codes
+GREEN="\033[0;32m"
+YELLOW="\033[1;33m"
+RED="\033[0;31m"
+BOLD="\033[1m"
+RESET="\033[0m"
+
+echo -e "${GREEN}${BOLD}********** SONARQUBE SETUP STARTED **********${RESET}"
 
 run_sonarqube() {
-  echo "Starting SonarQube container..."
-  docker run -itd \
-    --name SonarQube-Server \
-    -p 9000:9000 \
-    sonarqube:lts-community
+    echo -e "${YELLOW}${BOLD}Starting SonarQube container...${RESET}"
+    docker run -itd \
+        --name SonarQube-Server \
+        -p 9000:9000 \
+        sonarqube:lts-community
+    echo -e "${GREEN}${BOLD}✔ SonarQube container started successfully.${RESET}"
 }
 
 check_container() {
-  echo "Checking if SonarQube container is running..."
-  docker ps --filter "name=SonarQube-Server"
+    echo -e "${YELLOW}${BOLD}Checking if SonarQube container is running...${RESET}"
+    docker ps --filter "name=SonarQube-Server" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 }
 
-echo "********** SONARQUBE SETUP STARTED **********"
+show_sonarqube_url() {
+    echo -e "${YELLOW}${BOLD}Fetching EC2 public IP...${RESET}"
+    PUBLIC_IP=$(aws ec2 describe-instances \
+        --query 'Reservations[*].Instances[*].PublicIpAddress' \
+        --output text)
+    if [ -n "$PUBLIC_IP" ]; then
+        echo -e "${GREEN}${BOLD}✔ SonarQube is running at:${RESET} http://${PUBLIC_IP}:9000"
+        echo -e "${YELLOW}${BOLD}Default credentials:${RESET} admin / admin"
+    else
+        echo -e "${RED}${BOLD}❌ Could not fetch public IP. Make sure AWS CLI is configured.${RESET}"
+    fi
+}
 
 if ! run_sonarqube; then
-  echo "FAILED: Could not start SonarQube container"
-  exit 1
+    echo -e "${RED}${BOLD}❌ FAILED: Could not start SonarQube container${RESET}"
+    exit 1
 fi
 
-sleep 5
+sleep 20
 
 if ! check_container; then
-  echo "FAILED: SonarQube container is not running"
-  exit 1
+    echo -e "${RED}${BOLD}❌ FAILED: SonarQube container is not running${RESET}"
+    exit 1
 fi
 
-echo "********** SONARQUBE IS RUNNING ON PORT 9000 **********"
-echo "Access it in your browser: http://localhost:9000 or http://<public-ip>:9000"
+show_sonarqube_url
+
+echo -e "${GREEN}${BOLD}********** SONARQUBE SETUP COMPLETED **********${RESET}"
