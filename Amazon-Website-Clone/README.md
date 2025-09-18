@@ -3,6 +3,8 @@
 
 This project is originally done by Harish Shetty and in this project he used DevSecOps tools and methods to deploy an Amazon website clone along with GitOps practices.
 
+![Project Diagram](https://github.com/UXHERI/DevOps-Projects/blob/main/Amazon-Website-Clone/Images/Project-Diagram.png?raw=true)
+
 This project has several tech stack used in it and it integrates security best practices to make the deployment and infrastructure secure from vulnerabilities.
 
 ## Step-by-Step Project Guide
