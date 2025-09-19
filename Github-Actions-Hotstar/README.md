@@ -3,6 +3,8 @@
 
 This is a mini project about deploying **Amazon Hotstar** on **Docker** using **GitHub Actions**.
 
+![Project Diagram](https://github.com/UXHERI/DevOps-Projects/blob/main/Github-Actions-Hotstar/Images/Project-Diagram.png?raw=true)
+
 This project is done by _**Harish Shetty**_ in his **DevOps Projects** series where he deployed a **CI Pipeline** on **GitHub Actions** to deploy an application on **AWS EC2**.
 
 ## Step-by-Step Project Guide:
