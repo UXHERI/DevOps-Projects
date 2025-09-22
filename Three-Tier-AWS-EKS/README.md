@@ -85,7 +85,7 @@ git clone https://github.com/UXHERI/3-Tier-K8s-Project-GitOps.git
 ```
 
 > [!WARNING]
-> First, fork this repository and the clone your forked repository to deploy it.
+> First, fork this repository and then clone your forked repository to deploy it.
 
 - Now go to `k8s-http` file.
 
