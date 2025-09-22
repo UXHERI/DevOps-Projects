@@ -226,6 +226,9 @@ _It will complete the deployment shortly!_
 ![](https://github.com/UXHERI/DevOps-Projects/blob/main/Three-Tier-AWS-EKS/Images/23.png?raw=true)
 
 - Now copy this **Load Balancer's DNS**.
+
+![](https://github.com/UXHERI/DevOps-Projects/blob/main/Three-Tier-AWS-EKS/Images/24.png?raw=true)
+
 - Paste this in your browser.
 
 ![](https://github.com/UXHERI/DevOps-Projects/blob/main/Three-Tier-AWS-EKS/Images/25.png?raw=true)
