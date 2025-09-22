@@ -1,5 +1,5 @@
 
-# Three Tier EKS with ArgoCd
+# Three Tier AWS EKS with ArgoCd
 
 This is a mini **DevOps Project** where I deployed a three tier web app on **AWS EKS** with **ArgoCD**.
 
