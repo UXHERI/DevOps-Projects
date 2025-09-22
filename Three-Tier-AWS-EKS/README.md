@@ -3,6 +3,7 @@
 
 This is a mini **DevOps Project** where I deployed a three tier web app on **AWS EKS** with **ArgoCD**.
 
+![Project Diagram](https://github.com/UXHERI/DevOps-Projects/blob/main/Three-Tier-AWS-EKS/Images/diagram-export-9-22-2025-4_17_30-PM.png?raw=true)
 This project is originally by _**Harish Shetty**_ in which I will first deploy the app manually on **AWS EKS** and then use **ArgoCD** to deploy it automatically.
 
 ## Step-by-Step Project Guide
